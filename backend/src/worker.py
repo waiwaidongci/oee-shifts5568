@@ -4,8 +4,9 @@ import redis
 from src.config.database import Base,engine,Session
 from src.config.settings import REDIS_URL
 from src.models import identity,source,run
-from src.models.run import Run
+from src.models.run import Run,ImproveRun
 from src.services.calculation import calculate
+from src.services.improve import execute as improve_execute
 from src.services.delivery import tick
 Base.metadata.create_all(engine)
 r=redis.Redis.from_url(REDIS_URL)
@@ -21,6 +22,11 @@ while True:
      try: job.result=calculate(job.snapshot['sources'],job.snapshot['policy']);job.status='completed'
      except Exception as exc: job.status='failed';job.error=str(exc);traceback.print_exc()
      db.commit()
+  item=r.lpop('improve-jobs')
+  if item:
+   with Session() as db:
+    try: improve_execute(db,int(item))
+    except Exception: traceback.print_exc()
   with Session() as db: tick(db)
  except Exception: traceback.print_exc()
  time.sleep(1)

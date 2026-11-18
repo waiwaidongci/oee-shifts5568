@@ -3,6 +3,12 @@ from src.config.database import Base
 class Run(Base):
  __tablename__='oeeruns'
  id=Column(Integer,primary_key=True); name=Column(String(120)); status=Column(String(20)); snapshot=Column(JSON); checksum=Column(String(64)); result=Column(JSON); error=Column(Text); created=Column(Float); approved=Column(Boolean,default=False); review=Column(Text,default='')
+class ImproveMeasure(Base):
+ __tablename__='improve_measures'
+ id=Column(Integer,primary_key=True); name=Column(String(120),unique=True); cost=Column(Float); targets=Column(JSON); active=Column(Boolean,default=True); created=Column(Float)
+class ImproveRun(Base):
+ __tablename__='improve_runs'
+ id=Column(Integer,primary_key=True); name=Column(String(120)); status=Column(String(20)); budget=Column(Float); snapshot=Column(JSON); checksum=Column(String(64)); result=Column(JSON); error=Column(Text); created=Column(Float)
 class Schedule(Base):
  __tablename__='delivery_schedules'
  id=Column(Integer,primary_key=True); name=Column(String(120)); run_id=Column(Integer); interval_seconds=Column(Integer); next_at=Column(Float); enabled=Column(Boolean,default=True)
